@@ -1,0 +1,25 @@
+{
+  "name": "@vonagam/svelte-vest",
+  "version": "0.0.1",
+  "description": "Forms for Svelte with Vest",
+  "author": "Dmitry Maganov <vonagam@gmail.com>",
+  "license": "MIT",
+  "repository": "vonagam/svelte-vest",
+  "packageManager": "pnpm@8.7.5",
+  "type": "module",
+  "files": [
+    "build"
+  ],
+  "scripts": {
+  },
+  "peerDependencies": {
+    "svelte": "^4.2.0"
+  },
+  "dependencies": {
+    "vest": "5"
+  },
+  "devDependencies": {
+    "svelte": "^4.2.0",
+    "typescript": "^5.2.2"
+  }
+}
