@@ -10,18 +10,15 @@ export declare namespace FieldApi {
   type Summary = Vest.SuiteSummary<"", string>["tests"] extends {"": infer T} ? T : never;
 }
 
-export interface FieldApi<T = any, F extends string = keyof T & string, K extends F = F> {
+export interface FieldApi<V = any, A = V, F extends Access.Field<A> = Access.Field<A>> {
   getSummary: () => FieldApi.Summary;
-  test: () => Suite.RunResult<T, F>;
-  getValue: () => Access.Value<T, K>;
-  setValue: (value: Access.Value<T, K>) => void;
-  updateValue: (updater: Access.Updater<T, K>) => void;
+  test: () => Suite.RunResult<V, A>;
+  getValue: () => A[F];
+  setValue: (value: A[F]) => void;
+  updateValue: (updater: Access.Updater<V, A, F>) => void;
   removeValue: () => void;
   isDisabled: () => void;
   setDisabled: (bool?: boolean) => void;
-  isReadonly: () => void;
-  setReadonly: (bool?: boolean) => void;
-  isLocked: () => void;
   setTouched: (bool?: boolean) => void;
   setBlurred: (bool?: boolean) => void;
   onBlur: () => void;
@@ -46,12 +43,12 @@ export interface FieldApi<T = any, F extends string = keyof T & string, K extend
   getWarnings: () => string[];
 }
 
-export class FieldApi<T = any, F extends string = keyof T & string, K extends F = F> {
-  readonly form: FormApi<T, F>;
-  readonly field: FieldApi<T, F, K>;
-  readonly name: K;
+export class FieldApi<V = any, A = V, F extends Access.Field<A> = Access.Field<A>> {
+  readonly form: FormApi<V, A>;
+  readonly field: FieldApi<V, A, F>;
+  readonly name: F;
 
-  constructor(form: FormApi<T, F>, name: K) {
+  constructor(form: FormApi<V, A>, name: F) {
     this.form = form;
     this.field = this;
     this.name = name;
@@ -69,16 +66,10 @@ export class FieldApi<T = any, F extends string = keyof T & string, K extends F 
     return partialStore(this.form.values, this.getValue, this.setValue);
   }
 
-  // disabled / readonly
+  // disabled
 
   get disabled() {
     return partialStore(this.form.disabledFields, Has(this.name), this.setDisabled);
-  }
-  get readonly() {
-    return partialStore(this.form.readonlyFields, Has(this.name), this.setReadonly);
-  }
-  get locked() {
-    return Store.derived([this.disabled, this.readonly], ([disabled, readonly]) => disabled || readonly);
   }
 
   // interactions

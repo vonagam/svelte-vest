@@ -1,5 +1,6 @@
 <script lang="ts" context="module">
   import {onDestroy} from "svelte";
+  import {Access} from "./Access.js";
   import {FormApi} from "./FormApi.js";
   import {FieldApi} from "./FieldApi.js";
   import {useContextForm} from "./useForm.js";
@@ -8,8 +9,6 @@
     readonly summary: FieldApi.Summary | undefined,
     readonly value: any,
     readonly disabled: boolean,
-    readonly readonly: boolean,
-    readonly locked: boolean,
     readonly touched: boolean,
     readonly blurred: boolean,
     readonly valid: boolean,
@@ -32,8 +31,6 @@
     "summary",
     "value",
     "disabled",
-    "readonly",
-    "locked",
     "touched",
     "blurred",
     "valid",
@@ -56,18 +53,18 @@
     return storesKeys.has(key as keyof Stored);
   }
 
-  export interface F<T, F, K> extends Stored {}
-  export interface F<T, F, K> extends Omit<FieldApi<T, F, K>, keyof Stored> {}
+  export interface F<V, A, K> extends Stored {}
+  export interface F<V, A, K> extends Omit<FieldApi<V, A, K>, keyof Stored> {}
 
-  export class F<T = any, F extends string = keyof T & string, K extends F = F> {
-    readonly form: FormApi<T, F>;
-    readonly field: FieldApi<T, F, K>;
+  export class F<V = any, A = V, K extends Access.Field<A> = Access.Field<A>> {
+    readonly form: FormApi<V, A>;
+    readonly field: FieldApi<V, A, K>;
     readonly name: K;
 
     _unsubscribes?: (() => void)[];
     _invalidate: () => void;
 
-    constructor(field: FieldApi<T, F, K>, invalidate: () => void) {
+    constructor(field: FieldApi<V, A, K>, invalidate: () => void) {
       this.form = field.form;
       this.field = field;
       this.name = field.name;

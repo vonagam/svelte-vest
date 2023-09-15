@@ -1,21 +1,27 @@
 import * as Vest from "vest";
+import {Access} from "./Access.js";
 import {Test} from "./Test.js";
 
 export declare namespace Suite {
-  type Body<T = any, F extends string = keyof T & string> = (values: T, test: Test<T, F>) => void;
-  type Get<T = any, F extends string = keyof T & string> = Test.Get<T, F>;
-  type Callback<T = any, F extends string = keyof T & string> = (values: T, field?: F | F[]) => void;
-  type Result<T = any, F extends string = keyof T & string> = Vest.SuiteResult<F, string>;
-  type RunResult<T = any, F extends string = keyof T & string> = Vest.SuiteRunResult<F, string>;
+  type Body<V = any, A = V> = (values: V, test: Test<V, A>) => void;
+  type Selector<A = any> = Access.Field<A> | Access.Field<A>[];
+  // type Selectors<A = any> = {omit?: Selector<A>, skip?: Selector<A>, only?: Selector<A>};
+  type Callback<V = any, A = V> = (values: V, only?: Selector<A>) => void;
+  type Result<V = any, A = V> = Vest.SuiteResult<Access.Field<A>, string>;
+  type RunResult<V = any, A = V> = Vest.SuiteRunResult<Access.Field<A>, string>;
 }
 
-export type Suite<T = any, F extends string = keyof T & string> = Vest.Suite<F, string, Suite.Callback<T, F>>;
+export type Suite<V = any, A = V> = Vest.Suite<Access.Field<A>, string, Suite.Callback<V, A>>;
 
-export const Suite = <T, F extends string = keyof T & string>(run: Suite.Body<T, F>, get?: Suite.Get<T, F>) => {
-  const suite: Suite<T, F> = Vest.create((data: T, field?: F | F[]) => {
-    Vest.only(field);
-    const test = Test(data, get);
-    run(data, test);
+export const Suite = <V, A = V>(run: Suite.Body<V, A>, get: Access.Get<V, A>) => {
+  const suite: Suite<V, A> = Vest.create((values: V, only?: Suite.Selector<A>) => {
+    // TODO: Vest.optional(selectors?.omit)
+    // Vest.skip(selectors?.skip);
+    Vest.only(only);
+
+    const test = Test(values, get);
+
+    run(values, test);
   });
 
   return suite;

@@ -1,17 +1,17 @@
 export declare namespace Access {
-  type Key<I = any> = keyof I & string;
-  type Get<T = any, I = T> = <F extends Key<I>>(values: T, field: F) => I[F];
-  type Set<T = any, I = T> = <F extends Key<I>>(values: T, field: F, value: I[F]) => T;
-  type Remove<T = any, I = T> = <F extends Key<I>>(values: T, field: F) => T;
-  type Updater<T = any, I = T, F extends Key<I> = Key<I>> = (value: I[F]) => I[F];
-  type Update<T = any, I = T> = <F extends Key<I>>(values: T, field: F, updater: Updater<T, I, F>) => T;
+  type Field<A = any> = keyof A & string;
+  type Get<V = any, A = V> = <F extends Field<A>>(values: V, field: F) => A[F];
+  type Set<V = any, A = V> = <F extends Field<A>>(values: V, field: F, value: A[F]) => V;
+  type Remove<V = any, A = V> = <F extends Field<A>>(values: V, field: F) => V;
+  type Updater<V = any, A = V, F extends Field<A> = Field<A>> = (value: A[F]) => A[F];
+  type Update<V = any, A = V> = <F extends Field<A>>(values: V, field: F, updater: Updater<V, A, F>) => V;
 }
 
-export type Access<T = any, I = T> = {
-  get: Access.Get<T, I>,
-  set: Access.Set<T, I>,
-  remove: Access.Remove<T, I>,
-  update?: Access.Update<T, I>,
+export type Access<V = any, A = V> = {
+  get: Access.Get<V, A>,
+  set: Access.Set<V, A>,
+  remove: Access.Remove<V, A>,
+  update?: Access.Update<V, A>,
 };
 
 export const Access: Access = {

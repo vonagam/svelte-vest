@@ -18,5 +18,5 @@ export const vestSelectors = {
   pending: (summary?: vestSelectors.Summary) => !!summary?.pendingCount,
   warned: (summary?: vestSelectors.Summary) => !!summary?.warnCount,
   uncertain: (summary?: vestSelectors.Summary) => !summary?.valid && !summary?.errorCount,
-  omitted: (summary?: vestSelectors.Summary) => !!summary?.valid && !!summary?.testCount,
+  omitted: (summary?: vestSelectors.Summary) => !!summary?.valid && !summary?.testCount,
 };
