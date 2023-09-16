@@ -8,14 +8,9 @@ import {FieldApi} from "./FieldApi.js";
 export declare namespace FormApi {
   type Options<V = any, A = V> = {
     suite: Suite.Body<V, A>,
-    access?: Access<V, A>,
-    findInput?: ((field: Access.Field<A>) => HTMLElement | null | undefined) | string,
-
     values?: V,
-    disabled?: boolean,
-    disabledFields?: Iterable<Access.Field<A>>,
-    touchedFields?: Iterable<Access.Field<A>>,
-    blurredFields?: Iterable<Access.Field<A>>,
+    access?: Access<V, A>,
+    input?: ((field: Access.Field<A>) => HTMLElement | null | undefined) | string,
   };
 }
 
@@ -23,7 +18,7 @@ export class FormApi<V = any, A = V> {
   readonly form: FormApi<V, A>;
 
   private suite!: Suite<V, A>;
-  private find!: (field: Access.Field<A>) => HTMLElement | null | undefined;
+  private input!: (field: Access.Field<A>) => HTMLElement | null | undefined;
   private get!: Access.Get<V, A>;
   private set!: Access.Set<V, A>;
   private remove!: Access.Remove<V, A>;
@@ -31,10 +26,7 @@ export class FormApi<V = any, A = V> {
   private fields?: {[F in Access.Field<A>]: FieldApi<V, A, F>};
   private resultStore: ValueStore<Suite.Result<V, A>>;
   private valuesStore: ValueStore<V>;
-  private isDisabledStore?: ValueStore<boolean>;
-  private disabledStore?: SetStore<Access.Field<A>>;
-  private touchedStore?: SetStore<Access.Field<A>>;
-  private blurredStore?: SetStore<Access.Field<A>>;
+  private locksStore: LocksStore;
 
   // setup
 
@@ -42,6 +34,7 @@ export class FormApi<V = any, A = V> {
     this.form = this;
     this.resultStore = makeValueStore<Suite.Result<V, A>>();
     this.valuesStore = makeValueStore<V>();
+    this.locksStore = makeValueStore();
     this.resetApi(options);
   }
 
@@ -54,32 +47,15 @@ export class FormApi<V = any, A = V> {
 
     this.suite?.reset();
     this.suite = Suite(options.suite, get);
+
+    const input = options.input || (() => undefined);
+    this.input = typeof input === 'string'
+      ? ((field) => document.querySelector<HTMLElement>(input.replace(/\{\}/g, field)))
+      : input;
+
     this.resultStore.set(this.suite.get());
-
     this.valuesStore.set(options.values || {} as V);
-
-    const findInput = options.findInput || (() => undefined);
-    this.find = typeof findInput === 'string'
-      ? ((field) => document.querySelector<HTMLElement>(findInput.replace(/\{\}/g, field)))
-      : findInput;
-
-    if (this.isDisabledStore || options.disabled) {
-      this.isDisabledStore ||= makeValueStore();
-      this.isDisabledStore.set(!!options.disabled);
-    }
-
-    if (this.disabledStore || options.disabledFields) {
-      this.disabledStore ||= makeValueStore();
-      this.disabledStore.set(new Set(options.disabledFields));
-    }
-    if (this.touchedStore || options.touchedFields) {
-      this.touchedStore ||= makeValueStore();
-      this.touchedStore.set(new Set(options.touchedFields));
-    }
-    if (this.blurredStore || options.blurredFields) {
-      this.blurredStore ||= makeValueStore();
-      this.blurredStore.set(new Set(options.blurredFields));
-    }
+    this.locksStore.set(new Map());
   }
 
   // summary
@@ -152,109 +128,66 @@ export class FormApi<V = any, A = V> {
     return this.get(this.valuesStore.value, field);
   }
 
-  // disabled
+  // locks
 
-  setDisabled(bool?: boolean) {
-    this.isDisabledStore ||= makeValueStore();
-    this.isDisabledStore.set(bool ?? true);
+  lock() {
+    return doLockStore(this.locksStore, undefined);
   }
 
-  isDisabled() {
-    return !!this.isDisabledStore?.value;
+  isLocked() {
+    return this.locksStore.value.has(undefined);
   }
 
-  get disabled(): Store.Writable<boolean> {
-    return this.isDisabledStore ||= makeValueStore(false);
+  get locked() {
+    return Store.derived(this.locksStore, (locks) => locks.has(undefined));
   }
 
-  setFieldDisabled(field: Access.Field<A>, bool?: boolean) {
-    toggleSetStore(this.disabledStore ||= makeSetStore(), field, bool ?? true);
+  lockField(field: Access.Field<A>) {
+    return doLockStore(this.locksStore, String(field));
   }
 
-  isFieldDisabled(field: Access.Field<A>) {
-    return !!this.isDisabledStore?.value || !!this.disabledStore?.value.has(field);
+  isFieldLocked(field: Access.Field<A>) {
+    return this.isLocked() || this.locksStore.value.has(String(field));
   }
 
-  get disabledFields() {
-    return Store.readonly(this.disabledStore ||= makeSetStore());
+  get lockedFields() {
+    return Store.derived(this.locksStore, (locks) => {
+      const fields = new Set<Access.Field<A>>(locks.keys());
+      fields.delete(undefined as any);
+      return fields;
+    });
   }
 
-  // mark interactions
-
-  setFieldTouched(field: Access.Field<A>, bool?: boolean) {
-    toggleSetStore(this.touchedStore ||= makeSetStore(), field, bool ?? true);
-  }
-
-  setFieldBlurred(field: Access.Field<A>, bool?: boolean) {
-    toggleSetStore(this.blurredStore ||= makeSetStore(), field, bool ?? true);
-  }
-
-  // events callbacks
-
-  onFieldBlur(field: Access.Field<A>) {
-    if (!this.isFieldDisabled(field)) return;
-    this.setFieldBlurred(field, true);
-    if (!this.isFieldTested(field) && this.isFieldTouched(field)) this.testField(field);
-  }
+  // field events
 
   onFieldInput(field: Access.Field<A>, event: any) {
-    if (!this.isFieldDisabled(field)) return;
+    if (this.isFieldLocked(field)) return;
     const prev = this.valuesStore.value;
     this.setFieldValue(field, event.target.value);
     const next = this.valuesStore.value;
-    this.setFieldTouched(field, true);
     if (this.isFieldTested(field) && next !== prev) this.testField(field);
   }
 
   onFieldChange(field: Access.Field<A>, event: any) {
-    if (!this.isFieldDisabled(field)) return;
+    if (this.isFieldLocked(field)) return;
     const prev = this.valuesStore.value;
     this.setFieldValue(field, event.target.value);
     const next = this.valuesStore.value;
-    this.setFieldTouched(field, true);
-    this.setFieldBlurred(field, true);
     if (!this.isFieldTested(field) || next !== prev) this.testField(field);
   }
 
   // field input
 
   findFieldInput(field: Access.Field<A>) {
-    return this.find(field) || undefined;
+    return this.input(field) || undefined;
   }
 
   focusFieldInput(field: Access.Field<A>) {
-    this.find(field)?.focus();
+    this.input(field)?.focus();
   }
 
   blurFieldInput(field: Access.Field<A>) {
-    this.find(field)?.blur();
-  }
-
-  // interaction states
-
-  isTouched() {
-    return !!this.touchedStore?.value.size;
-  }
-  isFieldTouched(field: Access.Field<A>) {
-    return !!this.touchedStore?.value.has(field);
-  }
-  isBlurred() {
-    return !!this.blurredStore?.value.size;
-  }
-  isFieldBlurred(field: Access.Field<A>) {
-    return !!this.blurredStore?.value.has(field);
-  }
-  get touchedFields(): Store.Writable<Set<Access.Field<A>>> {
-    return this.touchedStore ||= makeSetStore();
-  }
-  get blurredFields(): Store.Writable<Set<Access.Field<A>>> {
-    return this.blurredStore ||= makeSetStore();
-  }
-  get touched() {
-    return Store.derived(this.touchedFields, (set) => set.size > 0);
-  }
-  get blurred() {
-    return Store.derived(this.blurredFields, (set) => set.size > 0);
+    this.input(field)?.blur();
   }
 
   // result states
@@ -414,20 +347,26 @@ const makeValueStore = <T>(value?: T) => {
   return store;
 };
 
-// SetStore
+// LocksStore
 
-type SetStore<T> = ValueStore<Set<T>>;
+type LocksStore = ValueStore<Map<any, Set<() => void>>>;
 
-const makeSetStore = <T>() => {
-  return makeValueStore(new Set<T>());
-};
+const doLockStore = (store: LocksStore, key: any) => {
+  const map = new Map(store.value);
+  const set = new Set(map.get(key));
 
-const toggleSetStore = <T>(store: SetStore<T>, item: T, next: boolean) => {
-  store.update((set) => {
-    const prev = set.has(item);
-    if (next === prev) return set;
-    set = new Set(set);
-    next ? set.add(item) : set.delete(item);
-    return set;
-  });
+  const unlock = () => {
+    if (!store.value.get(key)?.has(unlock)) return;
+    const map = new Map(store.value);
+    const set = new Set(map.get(key));
+    set.delete(unlock);
+    set.size === 0 ? map.delete(key): map.set(key, set);
+    store.set(map);
+  };
+
+  set.add(unlock);
+  map.set(key, set);
+  store.set(map);
+
+  return unlock;
 };

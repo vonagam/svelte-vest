@@ -13,22 +13,17 @@ export declare namespace FieldApi {
 export interface FieldApi<V = any, A = V, F extends Access.Field<A> = Access.Field<A>> {
   getSummary: () => FieldApi.Summary;
   test: () => Suite.RunResult<V, A>;
-  getValue: () => A[F];
   setValue: (value: A[F]) => void;
   updateValue: (updater: Access.Updater<V, A, F>) => void;
   removeValue: () => void;
-  isDisabled: () => void;
-  setDisabled: (bool?: boolean) => void;
-  setTouched: (bool?: boolean) => void;
-  setBlurred: (bool?: boolean) => void;
-  onBlur: () => void;
+  getValue: () => A[F];
+  lock: () => () => void;
+  isLocked: () => boolean;
   onInput: (event: any) => void;
   onChange: (event: any) => void;
   findInput: () => HTMLElement | undefined;
   focusInput: () => void;
   blurInput: () => void;
-  isTouched: () => boolean;
-  isBlurred: () => boolean;
   isValid: () => boolean;
   isInvalid: () => boolean;
   isTested: () => boolean;
@@ -66,19 +61,10 @@ export class FieldApi<V = any, A = V, F extends Access.Field<A> = Access.Field<A
     return partialStore(this.form.values, this.getValue, this.setValue);
   }
 
-  // disabled
+  // locks
 
-  get disabled() {
-    return partialStore(this.form.disabledFields, Has(this.name), this.setDisabled);
-  }
-
-  // interactions
-
-  get touched() {
-    return partialStore(this.form.touchedFields, Has(this.name), this.setTouched);
-  }
-  get blurred() {
-    return partialStore(this.form.blurredFields, Has(this.name), this.setBlurred);
+  get locked() {
+    return Store.derived(this.form.lockedFields, Has(this.name));
   }
 
   // states

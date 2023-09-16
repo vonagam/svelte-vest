@@ -8,9 +8,7 @@
   export type Stored = {
     readonly summary: FieldApi.Summary | undefined,
     readonly value: any,
-    readonly disabled: boolean,
-    readonly touched: boolean,
-    readonly blurred: boolean,
+    readonly locked: boolean,
     readonly valid: boolean,
     readonly invalid: boolean,
     readonly tested: boolean,
@@ -30,9 +28,7 @@
   const storesKeys = new Set<keyof Stored>([
     "summary",
     "value",
-    "disabled",
-    "touched",
-    "blurred",
+    "locked",
     "valid",
     "invalid",
     "tested",
