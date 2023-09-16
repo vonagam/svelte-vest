@@ -21,9 +21,11 @@
     "useDefineForClassFields": true,
 
     // Output
-    "lib": ["es2020"],
+    "lib": ["es2020", "dom"],
     "target": "es2020",
     "module": "node16",
     "moduleResolution": "node16",
+    "declaration": true,
+    "outDir": "build",
   },
 }

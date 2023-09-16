@@ -1,10 +1,6 @@
 import * as Vest from "vest";
 import {Access} from "./Access.js";
 
-/*
-A wrapper helper around Vest's `test` and `enforce`.
-*/
-
 export declare namespace Test {
   type Enforced = ReturnType<typeof Vest["enforce"]>;
   type Enforce = (message: string) => Enforced;
