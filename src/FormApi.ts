@@ -27,6 +27,7 @@ export class FormApi<V = any, A = V> {
   private resultStore: ValueStore<Suite.Result<V, A>>;
   private valuesStore: ValueStore<V>;
   private locksStore: LocksStore;
+  private submitStore: ValueStore<boolean>;
 
   // setup
 
@@ -35,6 +36,7 @@ export class FormApi<V = any, A = V> {
     this.resultStore = makeValueStore<Suite.Result<V, A>>();
     this.valuesStore = makeValueStore<V>();
     this.locksStore = makeValueStore();
+    this.submitStore = makeValueStore();
     this.resetApi(options);
   }
 
@@ -56,6 +58,7 @@ export class FormApi<V = any, A = V> {
     this.resultStore.set(this.suite.get());
     this.valuesStore.set(options.values || {} as V);
     this.locksStore.set(new Map());
+    this.submitStore.set(false);
   }
 
   // summary
@@ -156,6 +159,31 @@ export class FormApi<V = any, A = V> {
       fields.delete(undefined as any);
       return fields;
     });
+  }
+
+  // submitting
+
+  async submit<T>(action: (result: Suite.Result<V, A>) => T | Promise<T>): Promise<T | undefined> {
+    if (this.submitStore.value) return;
+
+    const unlock = this.lock();
+    this.submitStore.set(true);
+    const result = await new Promise<Suite.Result<V, A>>((resolve) => this.test().done(resolve));
+
+    try {
+      return await action(result);
+    } finally {
+      unlock();
+      this.submitStore.set(false);
+    }
+  }
+
+  isSubmitting() {
+    return this.submitStore.value;
+  }
+
+  get submitting() {
+    return Store.readonly(this.submitStore);
   }
 
   // field events
