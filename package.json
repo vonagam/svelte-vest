@@ -14,16 +14,15 @@
     "build": "svelte-package -i src -o build"
   },
   "peerDependencies": {
-    "svelte": "^4.2.0"
-  },
-  "dependencies": {
-    "vest": "5"
+    "svelte": "^4.2.0",
+    "vest": "^5.0.5"
   },
   "devDependencies": {
     "@sveltejs/package": "^2.2.2",
     "svelte": "^4.2.0",
     "svelte-preprocess": "^5.0.4",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "vest": "^5.0.5"
   },
   "exports": {
     ".": {
