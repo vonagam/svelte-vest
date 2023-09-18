@@ -19,8 +19,13 @@ export interface FieldApi<V = any, A = V, F extends Access.Field<A> = Access.Fie
   getValue: () => A[F];
   lock: () => () => void;
   isLocked: () => boolean;
+  setTouched: (bool?: boolean) => void;
+  isTouched: () => boolean;
+  setVisited: (bool?: boolean) => void;
+  isVisited: () => boolean;
   onInput: (event: any) => void;
   onChange: (event: any) => void;
+  onBlur: (event: any) => void;
   findInput: () => HTMLElement | undefined;
   focusInput: () => void;
   blurInput: () => void;
@@ -66,6 +71,15 @@ export class FieldApi<V = any, A = V, F extends Access.Field<A> = Access.Field<A
   get locked() {
     const {form: {locked, lockedFields}, name} = this;
     return Store.derived([locked, lockedFields], ([locked, lockedFields]) => locked || lockedFields.has(name));
+  }
+
+  // touched / visited
+
+  get touched() {
+    return partialStore(this.form.touchedFields, Has(this.name), this.setTouched);
+  }
+  get visited() {
+    return partialStore(this.form.visitedFields, Has(this.name), this.setVisited);
   }
 
   // states
@@ -120,6 +134,10 @@ export class FieldApi<V = any, A = V, F extends Access.Field<A> = Access.Field<A
 // laziness
 
 lazyPrototype(FieldApi.prototype);
+
+// Has
+
+const Has = <T, V extends T>(value: V) => (set: Set<T>) => set.has(value);
 
 // partialStore
 

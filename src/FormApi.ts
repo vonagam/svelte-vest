@@ -26,8 +26,10 @@ export class FormApi<V = any, A = V> {
   private fields?: {[F in Access.Field<A>]: FieldApi<V, A, F>};
   private resultStore: ValueStore<Suite.Result<V, A>>;
   private valuesStore: ValueStore<V>;
-  private locksStore: LocksStore;
-  private submitStore: ValueStore<boolean>;
+  private locksStore?: LocksStore;
+  private submitStore?: ValueStore<boolean>;
+  private touchedStore?: SetStore<Access.Field<A>>;
+  private visitedStore?: SetStore<Access.Field<A>>;
 
   // setup
 
@@ -35,8 +37,6 @@ export class FormApi<V = any, A = V> {
     this.form = this;
     this.resultStore = makeValueStore<Suite.Result<V, A>>();
     this.valuesStore = makeValueStore<V>();
-    this.locksStore = makeValueStore();
-    this.submitStore = makeValueStore();
     this.resetApi(options);
   }
 
@@ -57,8 +57,11 @@ export class FormApi<V = any, A = V> {
 
     this.resultStore.set(this.suite.get());
     this.valuesStore.set(options.values || {} as V);
-    this.locksStore.set(new Map());
-    this.submitStore.set(false);
+
+    this.locksStore?.set(new Map());
+    this.submitStore?.set(false);
+    this.touchedStore?.set(new Set());
+    this.visitedStore?.set(new Set());
   }
 
   // summary
@@ -134,27 +137,27 @@ export class FormApi<V = any, A = V> {
   // locks
 
   lock() {
-    return doLockStore(this.locksStore, undefined);
+    return useLocksStore(this.locksStore ||= makeLocksStore(), undefined);
   }
 
   isLocked() {
-    return this.locksStore.value.has(undefined);
+    return !!this.locksStore?.value.has(undefined);
   }
 
   get locked() {
-    return Store.derived(this.locksStore, (locks) => locks.has(undefined));
+    return Store.derived(this.locksStore ||= makeLocksStore(), (locks) => locks.has(undefined));
   }
 
   lockField(field: Access.Field<A>) {
-    return doLockStore(this.locksStore, String(field));
+    return useLocksStore(this.locksStore ||= makeLocksStore(), String(field));
   }
 
   isFieldLocked(field: Access.Field<A>) {
-    return this.isLocked() || this.locksStore.value.has(String(field));
+    return this.isLocked() || !!this.locksStore?.value.has(String(field));
   }
 
   get lockedFields() {
-    return Store.derived(this.locksStore, (locks) => {
+    return Store.derived(this.locksStore ||= makeLocksStore(), (locks) => {
       const fields = new Set<Access.Field<A>>(locks.keys());
       fields.delete(undefined as any);
       return fields;
@@ -164,6 +167,7 @@ export class FormApi<V = any, A = V> {
   // submitting
 
   async submit<T>(action: (result: Suite.Result<V, A>) => T | Promise<T>): Promise<T | undefined> {
+    this.submitStore ||= makeValueStore(false);
     if (this.submitStore.value) return;
 
     const unlock = this.lock();
@@ -179,11 +183,45 @@ export class FormApi<V = any, A = V> {
   }
 
   isSubmitting() {
-    return this.submitStore.value;
+    return !!this.submitStore?.value;
   }
 
   get submitting() {
-    return Store.readonly(this.submitStore);
+    return Store.readonly(this.submitStore ||= makeValueStore(false));
+  }
+
+  // touched / visited
+
+  isTouched() {
+    return !!this.touchedStore?.value.size;
+  }
+  get touched() {
+    return Store.derived(this.touchedFields, (set) => set.size > 0);
+  }
+  setFieldTouched(field: Access.Field<A>, bool?: boolean) {
+    toggleSetStore(this.touchedStore ||= makeSetStore(), field, bool ?? true);
+  }
+  isFieldTouched(field: Access.Field<A>) {
+    return !!this.touchedStore?.value.has(field);
+  }
+  get touchedFields(): Store.Writable<Set<Access.Field<A>>> {
+    return this.touchedStore ||= makeSetStore();
+  }
+
+  isVisited() {
+    return !!this.visitedStore?.value.size;
+  }
+  get visited() {
+    return Store.derived(this.visitedFields, (set) => set.size > 0);
+  }
+  setFieldVisited(field: Access.Field<A>, bool?: boolean) {
+    toggleSetStore(this.visitedStore ||= makeSetStore(), field, bool ?? true);
+  }
+  isFieldVisited(field: Access.Field<A>) {
+    return !!this.visitedStore?.value.has(field);
+  }
+  get visitedFields(): Store.Writable<Set<Access.Field<A>>> {
+    return this.visitedStore ||= makeSetStore();
   }
 
   // field events
@@ -193,6 +231,7 @@ export class FormApi<V = any, A = V> {
     const prev = this.valuesStore.value;
     this.setFieldValue(field, event.target.value);
     const next = this.valuesStore.value;
+    this.setFieldTouched(field, true);
     if (this.isFieldTested(field) && next !== prev) this.testField(field);
   }
 
@@ -201,7 +240,15 @@ export class FormApi<V = any, A = V> {
     const prev = this.valuesStore.value;
     this.setFieldValue(field, event.target.value);
     const next = this.valuesStore.value;
+    this.setFieldTouched(field, true);
+    this.setFieldVisited(field, true);
     if (!this.isFieldTested(field) || next !== prev) this.testField(field);
+  }
+
+  onFieldBlur(field: Access.Field<A>, event: any) {
+    if (this.isFieldLocked(field)) return;
+    this.setFieldVisited(field, true);
+    if (!this.isFieldTested(field) && this.isFieldTouched(field)) this.testField(field);
   }
 
   // field input
@@ -375,11 +422,33 @@ const makeValueStore = <T>(value?: T) => {
   return store;
 };
 
+// SetStore
+
+type SetStore<T> = ValueStore<Set<T>>;
+
+const makeSetStore = <T>() => {
+  return makeValueStore(new Set<T>());
+};
+
+const toggleSetStore = <T>(store: SetStore<T>, item: T, next: boolean) => {
+  store.update((set) => {
+    const prev = set.has(item);
+    if (next === prev) return set;
+    set = new Set(set);
+    next ? set.add(item) : set.delete(item);
+    return set;
+  });
+};
+
 // LocksStore
 
 type LocksStore = ValueStore<Map<any, Set<() => void>>>;
 
-const doLockStore = (store: LocksStore, key: any) => {
+const makeLocksStore = (): LocksStore => {
+  return makeValueStore(new Map());
+};
+
+const useLocksStore = (store: LocksStore, key: any) => {
   const map = new Map(store.value);
   const set = new Set(map.get(key));
 
