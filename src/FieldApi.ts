@@ -64,7 +64,8 @@ export class FieldApi<V = any, A = V, F extends Access.Field<A> = Access.Field<A
   // locks
 
   get locked() {
-    return Store.derived(this.form.lockedFields, Has(this.name));
+    const {form: {locked, lockedFields}, name} = this;
+    return Store.derived([locked, lockedFields], ([locked, lockedFields]) => locked || lockedFields.has(name));
   }
 
   // states
@@ -119,10 +120,6 @@ export class FieldApi<V = any, A = V, F extends Access.Field<A> = Access.Field<A
 // laziness
 
 lazyPrototype(FieldApi.prototype);
-
-// SetHas
-
-const Has = <T, V extends T>(value: V) => (set: Set<T>) => set.has(value);
 
 // partialStore
 
