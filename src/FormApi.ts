@@ -24,7 +24,7 @@ export class FormApi<V = any, A = V> {
   private remove!: Access.Remove<V, A>;
   private update!: Access.Update<V, A>;
   private fields?: {[F in Access.Field<A>]: FieldApi<V, A, F>};
-  private resultStore: ValueStore<Suite.Result<V, A>>;
+  private summaryStore: ValueStore<Suite.Summary<V, A>>;
   private valuesStore: ValueStore<V>;
   private locksStore?: LocksStore;
   private submitStore?: ValueStore<boolean>;
@@ -35,7 +35,7 @@ export class FormApi<V = any, A = V> {
 
   constructor(options: FormApi.Options<V, A>) {
     this.form = this;
-    this.resultStore = makeValueStore<Suite.Result<V, A>>();
+    this.summaryStore = makeValueStore<Suite.Summary<V, A>>();
     this.valuesStore = makeValueStore<V>();
     this.resetApi(options);
   }
@@ -55,7 +55,7 @@ export class FormApi<V = any, A = V> {
       ? ((field) => document.querySelector<HTMLElement>(input.replace(/\{\}/g, field)))
       : input;
 
-    this.resultStore.set(this.suite.get());
+    this.summaryStore.set(this.suite.get());
     this.valuesStore.set(options.values || {} as V);
 
     this.locksStore?.set(new Map());
@@ -67,15 +67,15 @@ export class FormApi<V = any, A = V> {
   // summary
 
   getSummary() {
-    return this.resultStore.value;
+    return this.summaryStore.value;
   }
 
   get summary() {
-    return Store.readonly(this.resultStore);
+    return Store.readonly(this.summaryStore);
   }
 
   getFieldSummary(field: Access.Field<A>) {
-    return this.resultStore.value.tests[field];
+    return this.summaryStore.value.tests[field];
   }
 
   // tests
@@ -86,11 +86,11 @@ export class FormApi<V = any, A = V> {
 
     result.done((result) => {
       sync = true;
-      this.resultStore.set(result);
+      this.summaryStore.set(result);
     });
 
     if (!sync) {
-      this.resultStore.set(result);
+      this.summaryStore.set(result);
     }
 
     return result;
@@ -166,16 +166,16 @@ export class FormApi<V = any, A = V> {
 
   // submitting
 
-  async submit<T>(action: (result: Suite.Result<V, A>) => T | Promise<T>): Promise<T | undefined> {
+  async submit<T>(action: (summary: Suite.Summary<V, A>) => T | Promise<T>): Promise<T | undefined> {
     this.submitStore ||= makeValueStore(false);
     if (this.submitStore.value) return;
 
     const unlock = this.lock();
     this.submitStore.set(true);
-    const result = await new Promise<Suite.Result<V, A>>((resolve) => this.test().done(resolve));
+    const summary = await new Promise<Suite.Summary<V, A>>((resolve) => this.test().done(resolve));
 
     try {
-      return await action(result);
+      return await action(summary);
     } finally {
       unlock();
       this.submitStore.set(false);
@@ -265,112 +265,112 @@ export class FormApi<V = any, A = V> {
     this.input(field)?.blur();
   }
 
-  // result states
+  // summary states
 
   isValid() {
-    return vestSelectors.valid(this.resultStore.value);
+    return vestSelectors.valid(this.summaryStore.value);
   }
   isInvalid() {
-    return vestSelectors.invalid(this.resultStore.value);
+    return vestSelectors.invalid(this.summaryStore.value);
   }
   isTested() {
-    return vestSelectors.tested(this.resultStore.value);
+    return vestSelectors.tested(this.summaryStore.value);
   }
   isUntested() {
-    return vestSelectors.untested(this.resultStore.value);
+    return vestSelectors.untested(this.summaryStore.value);
   }
   isWarned() {
-    return vestSelectors.warned(this.resultStore.value);
+    return vestSelectors.warned(this.summaryStore.value);
   }
   isUncertain() {
-    return vestSelectors.uncertain(this.resultStore.value);
+    return vestSelectors.uncertain(this.summaryStore.value);
   }
   isPending() {
-    return vestSelectors.pending(this.resultStore.value);
+    return vestSelectors.pending(this.summaryStore.value);
   }
   get valid() {
-    return Store.derived(this.resultStore, vestSelectors.valid);
+    return Store.derived(this.summaryStore, vestSelectors.valid);
   }
   get invalid() {
-    return Store.derived(this.resultStore, vestSelectors.invalid);
+    return Store.derived(this.summaryStore, vestSelectors.invalid);
   }
   get tested() {
-    return Store.derived(this.resultStore, vestSelectors.tested);
+    return Store.derived(this.summaryStore, vestSelectors.tested);
   }
   get untested() {
-    return Store.derived(this.resultStore, vestSelectors.untested);
+    return Store.derived(this.summaryStore, vestSelectors.untested);
   }
   get pending() {
-    return Store.derived(this.resultStore, vestSelectors.pending);
+    return Store.derived(this.summaryStore, vestSelectors.pending);
   }
   get warned() {
-    return Store.derived(this.resultStore, vestSelectors.warned);
+    return Store.derived(this.summaryStore, vestSelectors.warned);
   }
   get uncertain() {
-    return Store.derived(this.resultStore, vestSelectors.uncertain);
+    return Store.derived(this.summaryStore, vestSelectors.uncertain);
   }
   isFieldValid(field: Access.Field<A>) {
-    return vestSelectors.valid(this.resultStore.value.tests[field]);
+    return vestSelectors.valid(this.summaryStore.value.tests[field]);
   }
   isFieldInvalid(field: Access.Field<A>) {
-    return vestSelectors.invalid(this.resultStore.value.tests[field]);
+    return vestSelectors.invalid(this.summaryStore.value.tests[field]);
   }
   isFieldTested(field: Access.Field<A>) {
-    return vestSelectors.tested(this.resultStore.value.tests[field]);
+    return vestSelectors.tested(this.summaryStore.value.tests[field]);
   }
   isFieldUntested(field: Access.Field<A>) {
-    return vestSelectors.untested(this.resultStore.value.tests[field]);
+    return vestSelectors.untested(this.summaryStore.value.tests[field]);
   }
   isFieldPending(field: Access.Field<A>) {
-    return vestSelectors.pending(this.resultStore.value.tests[field]);
+    return vestSelectors.pending(this.summaryStore.value.tests[field]);
   }
   isFieldWarned(field: Access.Field<A>) {
-    return vestSelectors.warned(this.resultStore.value.tests[field]);
+    return vestSelectors.warned(this.summaryStore.value.tests[field]);
   }
   isFieldUncertain(field: Access.Field<A>) {
-    return vestSelectors.uncertain(this.resultStore.value.tests[field]);
+    return vestSelectors.uncertain(this.summaryStore.value.tests[field]);
   }
   isFieldOmitted(field: Access.Field<A>) {
-    return vestSelectors.omitted(this.resultStore.value.tests[field]);
+    return vestSelectors.omitted(this.summaryStore.value.tests[field]);
   }
 
-  // result messages
+  // summary messages
 
   getError(): Suite.Failure<V, A> | undefined {
-    return this.resultStore.value.getError() as any;
+    return this.summaryStore.value.getError() as any;
   }
   getErrors() {
-    return this.resultStore.value.getErrors();
+    return this.summaryStore.value.getErrors();
   }
   getWarning(): Suite.Failure<V, A> | undefined {
-    return this.resultStore.value.getWarning() as any;
+    return this.summaryStore.value.getWarning() as any;
   }
   getWarnings() {
-    return this.resultStore.value.getWarnings();
+    return this.summaryStore.value.getWarnings();
   }
   get error(): Store.Readable<Suite.Failure<V, A> | undefined> {
-    return Store.derived(this.resultStore, (r) => r.getError() as any);
+    return Store.derived(this.summaryStore, (s) => s.getError() as any);
   }
   get errors() {
-    return Store.derived(this.resultStore, (r) => r.getErrors());
+    return Store.derived(this.summaryStore, (s) => s.getErrors());
   }
   get warning(): Store.Readable<Suite.Failure<V, A> | undefined> {
-    return Store.derived(this.resultStore, (r) => r.getWarning() as any);
+    return Store.derived(this.summaryStore, (s) => s.getWarning() as any);
   }
   get warnings() {
-    return Store.derived(this.resultStore, (r) => r.getWarnings());
+    return Store.derived(this.summaryStore, (s) => s.getWarnings());
   }
   getFieldError(field: Access.Field<A>) {
-    return this.resultStore.value.getError(field) || "";
+    return this.summaryStore.value.getError(field) || "";
   }
   getFieldErrors(field: Access.Field<A>) {
-    return this.resultStore.value.getErrors(field);
+    return this.summaryStore.value.getErrors(field);
   }
   getFieldWarning(field: Access.Field<A>) {
-    return this.resultStore.value.getWarning(field) || "";
+    return this.summaryStore.value.getWarning(field) || "";
   }
   getFieldWarnings(field: Access.Field<A>) {
-    return this.resultStore.value.getWarnings(field);
+    return this.summaryStore.value.getWarnings(field);
   }
 
   // field api

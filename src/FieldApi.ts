@@ -12,7 +12,7 @@ export declare namespace FieldApi {
 
 export interface FieldApi<V = any, A = V, F extends Access.Field<A> = Access.Field<A>> {
   getSummary: () => FieldApi.Summary;
-  test: () => Suite.RunResult<V, A>;
+  test: () => Suite.RunSummary<V, A>;
   setValue: (value: A[F]) => void;
   updateValue: (updater: Access.Updater<V, A, F>) => void;
   removeValue: () => void;
@@ -112,16 +112,16 @@ export class FieldApi<V = any, A = V, F extends Access.Field<A> = Access.Field<A
   // messages
 
   get error() {
-    return Store.derived(this.form.summary, (r) => r.getError(this.name) || "");
+    return Store.derived(this.form.summary, (s) => s.getError(this.name) || "");
   }
   get errors() {
-    return Store.derived(this.form.summary, (r) => r.getErrors(this.name));
+    return Store.derived(this.form.summary, (s) => s.getErrors(this.name));
   }
   get warning() {
-    return Store.derived(this.form.summary, (r) => r.getWarning(this.name) || "");
+    return Store.derived(this.form.summary, (s) => s.getWarning(this.name) || "");
   }
   get warnings() {
-    return Store.derived(this.form.summary, (r) => r.getWarnings(this.name));
+    return Store.derived(this.form.summary, (s) => s.getWarnings(this.name));
   }
   get message() {
     return Store.derived([this.error, this.warning], ([error, warning]) => error || warning);
