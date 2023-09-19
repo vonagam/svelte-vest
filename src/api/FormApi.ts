@@ -1,8 +1,8 @@
 import * as Store from "svelte/store";
-import {vestSelectors} from './utils/vestSelectors.js';
+import {Selectors} from '../vest/Selectors.js';
 import {lazyPrototype} from './utils/lazyPrototype.js';
 import {Access} from "./Access.js";
-import {Suite} from "./Suite.js";
+import {Suite} from "../vest/Suite.js";
 import {FieldApi} from "./FieldApi.js";
 
 export declare namespace FormApi {
@@ -278,70 +278,70 @@ export class FormApi<V = any, A = V> {
   // summary states
 
   isValid() {
-    return vestSelectors.valid(this.summaryStore.value);
+    return Selectors.valid(this.summaryStore.value);
   }
   isInvalid() {
-    return vestSelectors.invalid(this.summaryStore.value);
+    return Selectors.invalid(this.summaryStore.value);
   }
   isTested() {
-    return vestSelectors.tested(this.summaryStore.value);
+    return Selectors.tested(this.summaryStore.value);
   }
   isUntested() {
-    return vestSelectors.untested(this.summaryStore.value);
+    return Selectors.untested(this.summaryStore.value);
   }
   isWarned() {
-    return vestSelectors.warned(this.summaryStore.value);
+    return Selectors.warned(this.summaryStore.value);
   }
   isUncertain() {
-    return vestSelectors.uncertain(this.summaryStore.value);
+    return Selectors.uncertain(this.summaryStore.value);
   }
   isPending() {
-    return vestSelectors.pending(this.summaryStore.value);
+    return Selectors.pending(this.summaryStore.value);
   }
   get valid() {
-    return Store.derived(this.summaryStore, vestSelectors.valid);
+    return Store.derived(this.summaryStore, Selectors.valid);
   }
   get invalid() {
-    return Store.derived(this.summaryStore, vestSelectors.invalid);
+    return Store.derived(this.summaryStore, Selectors.invalid);
   }
   get tested() {
-    return Store.derived(this.summaryStore, vestSelectors.tested);
+    return Store.derived(this.summaryStore, Selectors.tested);
   }
   get untested() {
-    return Store.derived(this.summaryStore, vestSelectors.untested);
+    return Store.derived(this.summaryStore, Selectors.untested);
   }
   get pending() {
-    return Store.derived(this.summaryStore, vestSelectors.pending);
+    return Store.derived(this.summaryStore, Selectors.pending);
   }
   get warned() {
-    return Store.derived(this.summaryStore, vestSelectors.warned);
+    return Store.derived(this.summaryStore, Selectors.warned);
   }
   get uncertain() {
-    return Store.derived(this.summaryStore, vestSelectors.uncertain);
+    return Store.derived(this.summaryStore, Selectors.uncertain);
   }
   isFieldValid(field: Access.Field<A>) {
-    return vestSelectors.valid(this.summaryStore.value.tests[field]);
+    return Selectors.valid(this.summaryStore.value.tests[field]);
   }
   isFieldInvalid(field: Access.Field<A>) {
-    return vestSelectors.invalid(this.summaryStore.value.tests[field]);
+    return Selectors.invalid(this.summaryStore.value.tests[field]);
   }
   isFieldTested(field: Access.Field<A>) {
-    return vestSelectors.tested(this.summaryStore.value.tests[field]);
+    return Selectors.tested(this.summaryStore.value.tests[field]);
   }
   isFieldUntested(field: Access.Field<A>) {
-    return vestSelectors.untested(this.summaryStore.value.tests[field]);
+    return Selectors.untested(this.summaryStore.value.tests[field]);
   }
   isFieldPending(field: Access.Field<A>) {
-    return vestSelectors.pending(this.summaryStore.value.tests[field]);
+    return Selectors.pending(this.summaryStore.value.tests[field]);
   }
   isFieldWarned(field: Access.Field<A>) {
-    return vestSelectors.warned(this.summaryStore.value.tests[field]);
+    return Selectors.warned(this.summaryStore.value.tests[field]);
   }
   isFieldUncertain(field: Access.Field<A>) {
-    return vestSelectors.uncertain(this.summaryStore.value.tests[field]);
+    return Selectors.uncertain(this.summaryStore.value.tests[field]);
   }
   isFieldOmitted(field: Access.Field<A>) {
-    return vestSelectors.omitted(this.summaryStore.value.tests[field]);
+    return Selectors.omitted(this.summaryStore.value.tests[field]);
   }
 
   // summary messages

@@ -1,9 +1,9 @@
 import * as Store from "svelte/store";
 import * as Vest from "vest";
-import {vestSelectors} from './utils/vestSelectors.js';
+import {Selectors} from '../vest/Selectors.js';
 import {lazyPrototype} from './utils/lazyPrototype.js';
 import {Access} from "./Access.js";
-import {Suite} from "./Suite.js";
+import {Suite} from "../vest/Suite.js";
 import {FormApi} from "./FormApi.js";
 
 export declare namespace FieldApi {
@@ -85,28 +85,28 @@ export class FieldApi<V = any, A = V, F extends Access.Field<A> = Access.Field<A
   // states
 
   get valid() {
-    return Store.derived(this.summary, vestSelectors.valid);
+    return Store.derived(this.summary, Selectors.valid);
   }
   get invalid() {
-    return Store.derived(this.summary, vestSelectors.invalid);
+    return Store.derived(this.summary, Selectors.invalid);
   }
   get tested() {
-    return Store.derived(this.summary, vestSelectors.tested);
+    return Store.derived(this.summary, Selectors.tested);
   }
   get untested() {
-    return Store.derived(this.summary, vestSelectors.untested);
+    return Store.derived(this.summary, Selectors.untested);
   }
   get pending() {
-    return Store.derived(this.summary, vestSelectors.pending);
+    return Store.derived(this.summary, Selectors.pending);
   }
   get warned() {
-    return Store.derived(this.summary, vestSelectors.warned);
+    return Store.derived(this.summary, Selectors.warned);
   }
   get uncertain() {
-    return Store.derived(this.summary, vestSelectors.uncertain);
+    return Store.derived(this.summary, Selectors.uncertain);
   }
   get omitted() {
-    return Store.derived(this.summary, vestSelectors.omitted);
+    return Store.derived(this.summary, Selectors.omitted);
   }
 
   // messages

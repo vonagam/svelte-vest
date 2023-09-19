@@ -1,5 +1,5 @@
 import * as Vest from "vest";
-import {Access} from "./Access.js";
+import {Access} from "../api/Access.js";
 import {Test} from "./Test.js";
 
 export declare namespace Suite {
