@@ -6,11 +6,19 @@ import {Suite} from "../vest/Suite.js";
 import {FieldApi} from "./FieldApi.js";
 
 export declare namespace FormApi {
+  export type {Access};
+}
+export declare namespace FormApi {
+  type Suite<V = any, A = V> = Suite.Body<V, A>;
+  type Input<V = any, A = V> = ((field: Access.Field<A>) => HTMLElement | null | undefined) | string;
+  type Action<V = any, A = V> = (form: FormApi<V, A>) => any;
+
   type Options<V = any, A = V> = {
-    suite: Suite.Body<V, A>,
+    suite: Suite<V, A>,
     values?: V,
     access?: Access<V, A>,
-    input?: ((field: Access.Field<A>) => HTMLElement | null | undefined) | string,
+    input?: Input<V, A>,
+    action?: Action<V, A>,
   };
 }
 
@@ -19,11 +27,11 @@ export class FormApi<V = any, A = V> {
 
   private suite!: Suite<V, A>;
   private input!: (field: Access.Field<A>) => HTMLElement | null | undefined;
+  private action?: (form: FormApi<V, A>) => any;
   private get!: Access.Get<V, A>;
   private set!: Access.Set<V, A>;
   private remove!: Access.Remove<V, A>;
   private update!: Access.Update<V, A>;
-  private fields?: {[F in Access.Field<A>]: FieldApi<V, A, F>};
   private summaryStore: ValueStore<Suite.Summary<V, A>>;
   private valuesStore: ValueStore<V>;
   private locksStore?: LocksStore;
@@ -31,6 +39,7 @@ export class FormApi<V = any, A = V> {
   private submittedStore?: ValueStore<boolean>;
   private touchedStore?: SetStore<Access.Field<A>>;
   private visitedStore?: SetStore<Access.Field<A>>;
+  private fields?: {[F in Access.Field<A>]: FieldApi<V, A, F>};
 
   // setup
 
@@ -55,6 +64,8 @@ export class FormApi<V = any, A = V> {
     this.input = typeof input === 'string'
       ? ((field) => document.querySelector<HTMLElement>(input.replace(/\{\}/g, field)))
       : input;
+
+    this.action = options.action;
 
     this.summaryStore.set(this.suite.get());
     this.valuesStore.set(options.values || {} as V);
@@ -168,7 +179,7 @@ export class FormApi<V = any, A = V> {
 
   // submitting
 
-  async submit<T>(action: (summary: Suite.Summary<V, A>) => T | Promise<T>): Promise<T | undefined> {
+  async submit(action: (form: FormApi<V, A>) => any = this.action!): Promise<any> {
     if (this.submitStore?.value) return;
     this.submitStore ||= makeValueStore(false);
     this.submittedStore ||= makeValueStore(false);
@@ -178,8 +189,8 @@ export class FormApi<V = any, A = V> {
     this.submittedStore.set(true);
 
     try {
-      const summary = await new Promise<Suite.Summary<V, A>>((resolve) => this.test().done(resolve));
-      return await action(summary);
+      await new Promise<Suite.Summary<V, A>>((resolve) => this.test().done(resolve));
+      return await action(this);
     } finally {
       unlock();
       this.submitStore.set(false);
@@ -234,7 +245,11 @@ export class FormApi<V = any, A = V> {
     return this.visitedStore ||= makeSetStore();
   }
 
-  // field events
+  // events
+
+  onSubmit(event: any) {
+    this.submit();
+  }
 
   onFieldInput(field: Access.Field<A>, event: any) {
     if (this.isFieldLocked(field)) return;
