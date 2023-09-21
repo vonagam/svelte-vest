@@ -8,15 +8,13 @@
 
 <script lang="ts">
   let formApi: FormApi | undefined = undefined;
-  let fieldApi: FieldApi | undefined = undefined;
-  let name: string | undefined = undefined;
+  let fieldApi: FieldApi | string;
   export {formApi as form};
   export {fieldApi as field};
-  export {name};
 
-  if (!fieldApi) {
+  if (typeof fieldApi === "string") {
     formApi ||= useContextForm();
-    fieldApi = formApi.field(name!);
+    fieldApi = formApi.field(fieldApi);
   }
 
   let field = new FieldWrap(fieldApi, [], () => { field = field });
