@@ -19,6 +19,8 @@ export declare namespace FormApi {
     access?: Access<V, A>,
     input?: Input<V, A>,
     action?: Action<V, A>,
+    touched?: Iterable<Access.Field<A>>,
+    visited?: Iterable<Access.Field<A>>,
   };
 }
 
@@ -73,8 +75,18 @@ export class FormApi<V = any, A = V> {
     this.locksStore?.set(new Map());
     this.submitStore?.set(false);
     this.submittedStore?.set(false);
-    this.touchedStore?.set(new Set());
-    this.visitedStore?.set(new Set());
+
+    if (options.touched) {
+      this.touchedFields.set(new Set(options.touched));
+    } else {
+      this.touchedStore?.set(new Set());
+    }
+
+    if (options.visited) {
+      this.visitedFields?.set(new Set(options.visited));
+    } else {
+      this.visitedStore?.set(new Set());
+    }
   }
 
   // summary
