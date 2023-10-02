@@ -28,6 +28,8 @@ export class FormApi<V = any, A = V> {
   readonly form: FormApi<V, A>;
 
   private suite!: Suite<V, A>;
+  private subscription!: Subscription;
+  private unsubscribe!: () => void;
   private input!: (field: Access.Field<A>) => HTMLElement | null | undefined;
   private action?: (form: FormApi<V, A>) => any;
   private get!: Access.Get<V, A>;
@@ -47,6 +49,7 @@ export class FormApi<V = any, A = V> {
 
   constructor(options: FormApi.Options<V, A>) {
     this.form = this;
+    this.subscription = Subscription(() => this.summaryStore.set(this.suite.get()));
     this.summaryStore = makeValueStore<Suite.Summary<V, A>>();
     this.valuesStore = makeValueStore<V>();
     this.resetApi(options);
@@ -59,8 +62,10 @@ export class FormApi<V = any, A = V> {
     this.remove = remove;
     this.update = update || (((values, field, updater) => set(values, field, updater(get(values, field)))));
 
+    this.unsubscribe?.();
     this.suite?.reset();
     this.suite = Suite(options.suite, get);
+    this.unsubscribe = this.suite.subscribe(this.subscription.async);
 
     const input = options.input || (() => undefined);
     this.input = typeof input === 'string'
@@ -107,14 +112,7 @@ export class FormApi<V = any, A = V> {
 
   test(only?: Access.Field<A> | Access.Field<A>[]) {
     const result = this.suite(this.valuesStore.value, only);
-    this.summaryStore.set(result);
-
-    if (result.pendingCount) {
-      result.done((result) => {
-        this.summaryStore.set(result);
-      });
-    }
-
+    this.subscription.sync();
     return result;
   }
 
@@ -198,15 +196,8 @@ export class FormApi<V = any, A = V> {
     this.submittedStore.set(true);
 
     try {
-      await new Promise<Suite.Summary<V, A>>((resolve) => {
-        const result = this.test();
-
-        if (result.pendingCount) {
-          result.done(resolve);
-        } else {
-          resolve(result);
-        }
-      });
+      await new Promise<Suite.Summary<V, A>>((resolve) => this.test().done(resolve));
+      this.subscription.sync();
       return await action(this);
     } finally {
       unlock();
@@ -444,6 +435,28 @@ for (const name of Object.getOwnPropertyNames(FormApi.prototype)) {
     return bind;
   }});
 }
+
+// Subscription
+
+type Subscription = {sync: () => void, async: () => void};
+
+const Subscription = (callback: () => void) => {
+  let timeout: any = undefined;
+
+  const sync = () => {
+    clearTimeout(timeout);
+    timeout = undefined;
+    callback();
+  };
+
+  const async = () => {
+    if (timeout === undefined) {
+      timeout = setTimeout(sync);
+    }
+  };
+
+  return {sync, async};
+};
 
 // ValueStore
 

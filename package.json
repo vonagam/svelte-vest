@@ -15,14 +15,14 @@
   },
   "peerDependencies": {
     "svelte": "^4.2.0",
-    "vest": "^5.1.0"
+    "vest": "^5.1.1"
   },
   "devDependencies": {
     "@sveltejs/package": "^2.2.2",
     "svelte": "^4.2.1",
     "svelte-preprocess": "^5.0.4",
     "typescript": "^5.2.2",
-    "vest": "^5.1.0"
+    "vest": "^5.1.1"
   },
   "exports": {
     ".": {

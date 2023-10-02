@@ -18,8 +18,8 @@ devDependencies:
     specifier: ^5.2.2
     version: 5.2.2
   vest:
-    specifier: ^5.1.0
-    version: 5.1.0
+    specifier: ^5.1.1
+    version: 5.1.1
 
 packages:
 
@@ -570,8 +570,8 @@ packages:
     resolution: {integrity: sha512-BL2XdKt38c5lugRQFrOsxefo5PWkOiUetnPTT/D51LXGMT83KX4au3x377Y3RpiOBxzrKEJkXJAtcrLSwel54Q==}
     dev: true
 
-  /vest@5.1.0:
-    resolution: {integrity: sha512-0nSbwGoLqr0z9lS56IrULkzBwedcfoiSMIqgqQvv+VeLi78roCZxogcXkwrfcHFU9vlIO0njDfq+NdyQAcgJ6g==}
+  /vest@5.1.1:
+    resolution: {integrity: sha512-/iigxA+/IW2gOJNNY6SRB2AbrkhV3O8W9v61zmDe/x8hu5RhfjmNZSgNK7NF0PKVRcdeuTkKKCrdvn1+iOPIiA==}
     dependencies:
       context: 3.0.13
       n4s: 5.0.6
