@@ -107,15 +107,12 @@ export class FormApi<V = any, A = V> {
 
   test(only?: Access.Field<A> | Access.Field<A>[]) {
     const result = this.suite(this.valuesStore.value, only);
-    let sync = false;
+    this.summaryStore.set(result);
 
-    result.done((result) => {
-      sync = true;
-      this.summaryStore.set(result);
-    });
-
-    if (!sync) {
-      this.summaryStore.set(result);
+    if (result.pendingCount) {
+      result.done((result) => {
+        this.summaryStore.set(result);
+      });
     }
 
     return result;
@@ -201,7 +198,15 @@ export class FormApi<V = any, A = V> {
     this.submittedStore.set(true);
 
     try {
-      await new Promise<Suite.Summary<V, A>>((resolve) => this.test().done(resolve));
+      await new Promise<Suite.Summary<V, A>>((resolve) => {
+        const result = this.test();
+
+        if (result.pendingCount) {
+          result.done(resolve);
+        } else {
+          resolve(result);
+        }
+      });
       return await action(this);
     } finally {
       unlock();
