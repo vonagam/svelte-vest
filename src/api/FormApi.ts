@@ -269,7 +269,7 @@ export class FormApi<V = any, A = V> {
     this.setFieldValue(field, event.target.value);
     const next = this.valuesStore.value;
     this.setFieldTouched(field, true);
-    if (this.isFieldTested(field) && next !== prev) this.testField(field);
+    if (this.isFieldTested(field) ? next !== prev : this.isFieldVisited(field)) this.testField(field);
   }
 
   onFieldChange(field: Access.Field<A>, event: any) {
