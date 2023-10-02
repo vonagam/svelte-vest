@@ -37,7 +37,7 @@ export class FormApi<V = any, A = V> {
   private summaryStore: ValueStore<Suite.Summary<V, A>>;
   private valuesStore: ValueStore<V>;
   private locksStore?: LocksStore;
-  private submitStore?: ValueStore<boolean>;
+  private submittingStore?: ValueStore<boolean>;
   private submittedStore?: ValueStore<boolean>;
   private touchedStore?: SetStore<Access.Field<A>>;
   private visitedStore?: SetStore<Access.Field<A>>;
@@ -73,7 +73,7 @@ export class FormApi<V = any, A = V> {
     this.valuesStore.set(options.values || {} as V);
 
     this.locksStore?.set(new Map());
-    this.submitStore?.set(false);
+    this.submittingStore?.set(false);
     this.submittedStore?.set(false);
 
     if (options.touched) {
@@ -192,12 +192,12 @@ export class FormApi<V = any, A = V> {
   // submitting
 
   async submit(action: (form: FormApi<V, A>) => any = this.action!): Promise<any> {
-    if (this.submitStore?.value) return;
-    this.submitStore ||= makeValueStore(false);
+    if (this.submittingStore?.value) return;
+    this.submittingStore ||= makeValueStore(false);
     this.submittedStore ||= makeValueStore(false);
 
     const unlock = this.lock();
-    this.submitStore.set(true);
+    this.submittingStore.set(true);
     this.submittedStore.set(true);
 
     try {
@@ -205,15 +205,15 @@ export class FormApi<V = any, A = V> {
       return await action(this);
     } finally {
       unlock();
-      this.submitStore.set(false);
+      this.submittingStore.set(false);
     }
   }
 
   isSubmitting() {
-    return !!this.submitStore?.value;
+    return !!this.submittingStore?.value;
   }
   get submitting() {
-    return Store.readonly(this.submitStore ||= makeValueStore(false));
+    return Store.readonly(this.submittingStore ||= makeValueStore(false));
   }
 
   isSubmitted() {
