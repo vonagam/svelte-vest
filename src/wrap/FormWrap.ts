@@ -19,6 +19,7 @@ const storesKeys = [
   "pending",
   "warned",
   "uncertain",
+  "omitted",
   "error",
   "errors",
   "warning",

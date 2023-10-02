@@ -316,14 +316,17 @@ export class FormApi<V = any, A = V> {
   isUntested() {
     return Selectors.untested(this.summaryStore.value);
   }
+  isPending() {
+    return Selectors.pending(this.summaryStore.value);
+  }
   isWarned() {
     return Selectors.warned(this.summaryStore.value);
   }
   isUncertain() {
     return Selectors.uncertain(this.summaryStore.value);
   }
-  isPending() {
-    return Selectors.pending(this.summaryStore.value);
+  isOmitted() {
+    return Selectors.omitted(this.summaryStore.value);
   }
   get valid() {
     return Store.derived(this.summaryStore, Selectors.valid);
@@ -345,6 +348,9 @@ export class FormApi<V = any, A = V> {
   }
   get uncertain() {
     return Store.derived(this.summaryStore, Selectors.uncertain);
+  }
+  get omitted() {
+    return Store.derived(this.summaryStore, Selectors.omitted);
   }
   isFieldValid(field: Access.Field<A>) {
     return Selectors.valid(this.summaryStore.value.tests[field]);
