@@ -30,8 +30,12 @@
       "import": "./build/index.js"
     },
     "./Field.svelte": {
-      "types": "./build/lib/Field.d.ts",
-      "svelte": "./build/lib/Field.svelte"
+      "types": "./build/wrap/Field.svelte.d.ts",
+      "svelte": "./build/wrap/Field.svelte"
+    },
+    "./Form.svelte": {
+      "types": "./build/wrap/Form.svelte.d.ts",
+      "svelte": "./build/wrap/Form.svelte"
     }
   }
 }
