@@ -1,0 +1,25 @@
+{
+	"extends": "./.svelte-kit/tsconfig.json",
+	"compilerOptions": {
+    // Checks
+    "allowUnusedLabels": false,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strict": true,
+    "types": ["vite/client"],
+
+    // Interop
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+
+    // Output
+    "moduleResolution": "nodenext",
+		"module": "nodenext",
+    "skipLibCheck": true,
+    "sourceMap": true,
+	},
+}

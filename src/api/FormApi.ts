@@ -198,7 +198,7 @@ export class FormApi<V = any, A = V> {
     try {
       await new Promise<Suite.Summary<V, A>>((resolve) => this.test().done(resolve));
       this.subscription.sync();
-      return await action(this);
+      return await action?.(this);
     } finally {
       unlock();
       this.submittingStore.set(false);

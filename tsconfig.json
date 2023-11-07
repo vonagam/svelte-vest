@@ -12,13 +12,7 @@
 
     // Interop Constraints
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-
-    // Language and Environment
-    "experimentalDecorators": true,
-    "useDefineForClassFields": true,
 
     // Output
     "lib": ["es2022", "dom"],

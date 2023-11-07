@@ -1,11 +1,11 @@
 {
   "name": "@vonagam/svelte-vest",
   "version": "0.0.1",
-  "description": "Forms for Svelte with Vest",
+  "description": "Helpers for using Vest with Svelte",
   "author": "Dmitry Maganov <vonagam@gmail.com>",
   "license": "MIT",
   "repository": "vonagam/svelte-vest",
-  "packageManager": "pnpm@8.7.5",
+  "packageManager": "pnpm@8.9.2",
   "type": "module",
   "files": [
     "build"
@@ -14,28 +14,44 @@
     "build": "svelte-package -i src -o build"
   },
   "peerDependencies": {
-    "svelte": "^4.2.0",
-    "vest": "^5.1.1"
+    "svelte": "^4.2.2",
+    "vest": "^5.1.2"
   },
   "devDependencies": {
     "@sveltejs/package": "^2.2.2",
-    "svelte": "^4.2.1",
+    "svelte": "^4.2.2",
     "svelte-preprocess": "^5.0.4",
     "typescript": "^5.2.2",
-    "vest": "^5.1.1"
+    "vest": "^5.1.2"
   },
   "exports": {
     ".": {
-      "types": "./build/index.d.ts",
-      "import": "./build/index.js"
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
     },
     "./Field.svelte": {
-      "types": "./build/wrap/Field.svelte.d.ts",
-      "svelte": "./build/wrap/Field.svelte"
+      "types": "./src/wrap/Field.svelte.d.ts",
+      "svelte": "./src/wrap/Field.svelte"
     },
     "./Form.svelte": {
-      "types": "./build/wrap/Form.svelte.d.ts",
-      "svelte": "./build/wrap/Form.svelte"
+      "types": "./src/wrap/Form.svelte.d.ts",
+      "svelte": "./src/wrap/Form.svelte"
+    }
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./build/index.d.ts",
+        "import": "./build/index.js"
+      },
+      "./Field.svelte": {
+        "types": "./build/wrap/Field.svelte.d.ts",
+        "svelte": "./build/wrap/Field.svelte"
+      },
+      "./Form.svelte": {
+        "types": "./build/wrap/Form.svelte.d.ts",
+        "svelte": "./build/wrap/Form.svelte"
+      }
     }
   }
 }
