@@ -24,7 +24,7 @@ importers:
         specifier: ^5.1.2
         version: 5.1.2
 
-  example:
+  packages/examples:
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: ^2.0.0
@@ -34,7 +34,7 @@ importers:
         version: 1.27.3(svelte@4.2.2)(vite@4.5.0)
       '@vonagam/svelte-vest':
         specifier: workspace:*
-        version: link:..
+        version: link:../..
       svelte:
         specifier: ^4.0.5
         version: 4.2.2
