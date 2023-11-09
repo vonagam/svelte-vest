@@ -27,10 +27,10 @@ pnpm add --save-dev @vonagam/svelte-vest
     username?: string,
   };
 
-  // Define Vest suite body. 
-  // First argument is a current form state.
-  // Second argument is a helper function for writing tests, its usage is optional - usual Vest stuff works too.
-  const suite: Suite.Body<State> = (_state, test) => {
+  // Define Vest suite body.
+  // An argument object contains `values` (form state) and `test` (helper for writing tests).
+  // Usage of `test` is optional, all usual Vest methods do work.
+  const suite: Suite.Body<State> = ({test}) => {
     test("username", ({enforce}) => {
       enforce("Must be specified.").isString().isNotBlank();
       enforce("Must be at least 4 symbols long.").longerThanOrEquals(4);
@@ -60,9 +60,8 @@ pnpm add --save-dev @vonagam/svelte-vest
   useForm({suite, action});
 </script>
 
-<!-- Access a specific field wrapper with `Field` -->
-<Field field="username" let:field>
-  <!-- `field` is `FieldWrap` which is a wrapper around `FieldApi`: -->
+<!-- Access a field with `VestField`, provides `FieldWrap` through `field` -->
+<VestField field="username" let:field>
   <!-- Accessing properties with stores will return a value and create a subscription for rerendering. -->
   <!-- In this example, `value`, `locked`, `visited`, `message` and `subbmitted` on `form` do that. -->
   <input
@@ -74,15 +73,15 @@ pnpm add --save-dev @vonagam/svelte-vest
     on:blur={field.onBlur}
   />
 
-  <!-- Shows an error message, but only if a field has been visited or form has been submitted already. -->
+  <!-- Shows an error message, but only if a field has been visited or a form has been submitted already. -->
   {#if field.visited || field.form.submitted}
     <div>{field.message}</div>
   {/if}
-</Field>
+</VestField>
 
-<!-- Access a form wrapper with `Form`` -->
-<Form let:form>
-  <!-- It is convinient to use `@const` in `Form`/`Field` -->
+<!-- Access a form with `VestForm`, provides `FormWrap` through `field` -->
+<VestForm let:form>
+  <!-- `@const` can be handy in `VestForm`/`VestField` -->
   {@const disabled = form.locked || form.omitted}
 
   <button disabled={disabled} on:click={form.onSubmit}>
@@ -92,5 +91,5 @@ pnpm add --save-dev @vonagam/svelte-vest
       Submit
     {/if}
   </button>
-</Form>
+</VestForm>
 ```

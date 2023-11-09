@@ -3,7 +3,8 @@ import {Access} from "../api/Access.js";
 import {Test} from "./Test.js";
 
 export declare namespace Suite {
-  type Body<V = any, A = V> = (values: V, test: Test<V, A>) => void;
+  type Input<V = any, A = V> = {values: V, test: Test<V, A>};
+  type Body<V = any, A = V> = (input: Input<V, A>) => void;
   type Selector<A = any> = Access.Field<A> | Access.Field<A>[];
   type Callback<V = any, A = V> = (values: V, only?: Selector<A>) => void;
   type Summary<V = any, A = V> = Vest.SuiteResult<Access.Field<A>, string>;
@@ -17,7 +18,7 @@ export const Suite = <V, A = V>(run: Suite.Body<V, A>, get: Access.Get<V, A>) =>
   const suite: Suite<V, A> = Vest.create((values: V, only?: Suite.Selector<A>) => {
     Vest.only(only);
     const test = Test(values, get);
-    run(values, test);
+    run({values, test});
   });
 
   return suite;

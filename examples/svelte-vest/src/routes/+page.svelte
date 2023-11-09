@@ -1,12 +1,12 @@
 <script lang="ts" context="module">
   import type {FormApi, Suite} from "@vonagam/svelte-vest";
-  import {useForm, Field, Form} from "@vonagam/svelte-vest";
+  import {useForm, VestField, VestForm} from "@vonagam/svelte-vest";
 
   type State = {
     username?: string,
   };
 
-  const suite: Suite.Body<State> = (_state, test) => {
+  const suite: Suite.Body<State> = ({test}) => {
     test("username", ({enforce}) => {
       enforce("Must be specified.").isString().isNotBlank();
       enforce("Must be at least 4 symbols long.").longerThanOrEquals(4);
@@ -26,7 +26,7 @@
   useForm({suite, action});
 </script>
 
-<Field field="username" let:field>
+<VestField field="username" let:field>
   <input
     type="text"
     value={field.value || ""}
@@ -39,9 +39,9 @@
   {#if field.visited || field.form.submitted}
     <div>{field.message}</div>
   {/if}
-</Field>
+</VestField>
 
-<Form let:form>
+<VestForm let:form>
   {@const disabled = form.locked || form.omitted}
 
   <button disabled={disabled} on:click={form.onSubmit}>
@@ -51,4 +51,4 @@
       Submit
     {/if}
   </button>
-</Form>
+</VestForm>

@@ -7,7 +7,7 @@ export {Selectors} from "./vest/Selectors.js";
 export {Suite} from "./vest/Suite.js";
 export {Test} from "./vest/Test.js";
 
-export {default as Field} from "./wrap/Field.svelte";
 export {FieldWrap} from "./wrap/FieldWrap.js";
-export {default as Form} from "./wrap/Form.svelte";
 export {FormWrap} from "./wrap/FormWrap.js";
+export {default as VestField} from "./wrap/VestField.svelte";
+export {default as VestForm} from "./wrap/VestForm.svelte";

@@ -29,13 +29,13 @@
       "types": "./src/index.d.ts",
       "import": "./src/index.js"
     },
-    "./Field.svelte": {
-      "types": "./src/wrap/Field.svelte.d.ts",
-      "svelte": "./src/wrap/Field.svelte"
+    "./VestField.svelte": {
+      "types": "./src/wrap/VestField.svelte.d.ts",
+      "svelte": "./src/wrap/VestField.svelte"
     },
-    "./Form.svelte": {
-      "types": "./src/wrap/Form.svelte.d.ts",
-      "svelte": "./src/wrap/Form.svelte"
+    "./VestForm.svelte": {
+      "types": "./src/wrap/VestForm.svelte.d.ts",
+      "svelte": "./src/wrap/VestForm.svelte"
     }
   },
   "publishConfig": {
@@ -44,13 +44,13 @@
         "types": "./build/index.d.ts",
         "import": "./build/index.js"
       },
-      "./Field.svelte": {
-        "types": "./build/wrap/Field.svelte.d.ts",
-        "svelte": "./build/wrap/Field.svelte"
+      "./VestField.svelte": {
+        "types": "./build/wrap/VestField.svelte.d.ts",
+        "svelte": "./build/wrap/VestField.svelte"
       },
-      "./Form.svelte": {
-        "types": "./build/wrap/Form.svelte.d.ts",
-        "svelte": "./build/wrap/Form.svelte"
+      "./VestForm.svelte": {
+        "types": "./build/wrap/VestForm.svelte.d.ts",
+        "svelte": "./build/wrap/VestForm.svelte"
       }
     }
   }
