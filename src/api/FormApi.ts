@@ -10,14 +10,14 @@ export declare namespace FormApi {
 }
 export declare namespace FormApi {
   type Suite<V = any, A = V> = Suite.Body<V, A>;
-  type Input<V = any, A = V> = ((field: Access.Field<A>) => HTMLElement | null | undefined) | string;
+  type Selector<V = any, A = V> = ((field: Access.Field<A>) => HTMLElement | null | undefined) | string;
   type Action<V = any, A = V> = (form: FormApi<V, A>) => any;
 
   type Options<V = any, A = V> = {
     suite: Suite<V, A>,
     values?: V,
     access?: Access<V, A>,
-    input?: Input<V, A>,
+    selector?: Selector<V, A>,
     action?: Action<V, A>,
     touched?: Iterable<Access.Field<A>>,
     visited?: Iterable<Access.Field<A>>,
@@ -30,7 +30,7 @@ export class FormApi<V = any, A = V> {
   private suite!: Suite<V, A>;
   private subscription!: Subscription;
   private unsubscribe!: () => void;
-  private input!: (field: Access.Field<A>) => HTMLElement | null | undefined;
+  private selector!: (field: Access.Field<A>) => HTMLElement | null | undefined;
   private action?: (form: FormApi<V, A>) => any;
   private get!: Access.Get<V, A>;
   private set!: Access.Set<V, A>;
@@ -45,7 +45,7 @@ export class FormApi<V = any, A = V> {
   private visitedStore?: SetStore<Access.Field<A>>;
   private fields?: {[F in Access.Field<A>]: FieldApi<V, A, F>};
 
-  // setup
+  // Setup
 
   constructor(options: FormApi.Options<V, A>) {
     this.form = this;
@@ -67,10 +67,10 @@ export class FormApi<V = any, A = V> {
     this.suite = Suite(options.suite, get);
     this.unsubscribe = this.suite.subscribe(this.subscription.async);
 
-    const input = options.input || (() => undefined);
-    this.input = typeof input === 'string'
-      ? ((field) => document.querySelector<HTMLElement>(input.replace(/\{\}/g, field)))
-      : input;
+    const selector = options.selector || (() => undefined);
+    this.selector = typeof selector === 'string'
+      ? ((field) => document.querySelector<HTMLElement>(selector.replace(/\{\}/g, field)))
+      : selector;
 
     this.action = options.action;
 
@@ -94,7 +94,7 @@ export class FormApi<V = any, A = V> {
     }
   }
 
-  // summary
+  // Summary
 
   getSummary() {
     return this.summaryStore.value;
@@ -108,7 +108,7 @@ export class FormApi<V = any, A = V> {
     return this.summaryStore.value.tests[field];
   }
 
-  // tests
+  // Tests
 
   test(only?: Access.Field<A> | Access.Field<A>[]) {
     const result = this.suite(this.valuesStore.value, only);
@@ -120,7 +120,7 @@ export class FormApi<V = any, A = V> {
     return this.test(field);
   }
 
-  // form values
+  // Values
 
   setValues(values: V) {
     this.valuesStore.set(values);
@@ -150,11 +150,11 @@ export class FormApi<V = any, A = V> {
     this.valuesStore.set(this.remove(this.valuesStore.value, field));
   }
 
-  getFieldValue(field: Access.Field<A>) {
+  getFieldValue<F extends Access.Field<A>>(field: F) {
     return this.get(this.valuesStore.value, field);
   }
 
-  // locks
+  // Locks
 
   lock() {
     return useLocksStore(this.locksStore ||= makeLocksStore(), undefined);
@@ -184,7 +184,7 @@ export class FormApi<V = any, A = V> {
     });
   }
 
-  // submitting
+  // Submit
 
   async submit(action: (form: FormApi<V, A>) => any = this.action!): Promise<any> {
     if (this.submittingStore?.value) return;
@@ -219,7 +219,7 @@ export class FormApi<V = any, A = V> {
     return Store.readonly(this.submittedStore ||= makeValueStore(false));
   }
 
-  // touched / visited
+  // Touched / Visited
 
   isTouched() {
     return !!this.touchedStore?.value.size;
@@ -253,9 +253,9 @@ export class FormApi<V = any, A = V> {
     return this.visitedStore ||= makeSetStore();
   }
 
-  // events
+  // Event handlers
 
-  onSubmit(event: any) {
+  onSubmit(_event: any) {
     this.submit();
   }
 
@@ -278,27 +278,27 @@ export class FormApi<V = any, A = V> {
     if (!this.isFieldTested(field) || next !== prev) this.testField(field);
   }
 
-  onFieldBlur(field: Access.Field<A>, event: any) {
+  onFieldBlur(field: Access.Field<A>, _event: any) {
     if (this.isFieldLocked(field)) return;
     this.setFieldVisited(field, true);
     if (!this.isFieldTested(field) && this.isFieldTouched(field)) this.testField(field);
   }
 
-  // field input
+  // Input elements
 
   findFieldInput(field: Access.Field<A>) {
-    return this.input(field) || undefined;
+    return this.selector(field) || undefined;
   }
 
   focusFieldInput(field: Access.Field<A>) {
-    this.input(field)?.focus();
+    this.selector(field)?.focus();
   }
 
   blurFieldInput(field: Access.Field<A>) {
-    this.input(field)?.blur();
+    this.selector(field)?.blur();
   }
 
-  // summary states
+  // Summary states
 
   isValid() {
     return Selectors.valid(this.summaryStore.value);
@@ -373,7 +373,7 @@ export class FormApi<V = any, A = V> {
     return Selectors.omitted(this.summaryStore.value.tests[field]);
   }
 
-  // summary messages
+  // Summary messages
 
   getError(): Suite.Failure<V, A> | undefined {
     return this.summaryStore.value.getError() as any;
@@ -412,7 +412,7 @@ export class FormApi<V = any, A = V> {
     return this.summaryStore.value.getWarnings(field);
   }
 
-  // field api
+  // Field apis
 
   field<F extends Access.Field<A>>(field: F): FieldApi<V, A, F> {
     return (this.fields ||= Object.create(null))[field] ||= new FieldApi(this, field);

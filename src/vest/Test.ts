@@ -1,5 +1,5 @@
 import * as Vest from "vest";
-import {Access} from "../api/Access.js";
+import type {Access} from "../api/Access.js";
 
 export declare namespace Test {
   type Enforced = ReturnType<typeof Vest["enforce"]>;

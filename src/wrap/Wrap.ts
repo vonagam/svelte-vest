@@ -1,4 +1,4 @@
-import * as Store from "svelte/store";
+import type * as Store from "svelte/store";
 
 export declare namespace Wrap {
   type ArrayElementType<T> = T extends readonly (infer E)[] ? E : never;

@@ -1,10 +1,10 @@
 import * as Store from "svelte/store";
-import * as Vest from "vest";
+import type * as Vest from "vest";
 import {Selectors} from '../vest/Selectors.js';
 import {lazyPrototype} from './utils/lazyPrototype.js';
-import {Access} from "./Access.js";
-import {Suite} from "../vest/Suite.js";
-import {FormApi} from "./FormApi.js";
+import type {Access} from "./Access.js";
+import type {Suite} from "../vest/Suite.js";
+import type {FormApi} from "./FormApi.js";
 
 export declare namespace FieldApi {
   type Summary = Vest.SuiteSummary<"", string>["tests"] extends {"": infer T} ? T : never;
@@ -54,26 +54,26 @@ export class FieldApi<V = any, A = V, F extends Access.Field<A> = Access.Field<A
     this.name = name;
   }
 
-  // tests
+  // Tests
 
   get summary() {
     return Store.derived(this.form.summary, (summary) => summary.tests[this.name] as FieldApi.Summary);
   }
 
-  // data
+  // Values
 
   get value() {
     return partialStore(this.form.values, this.getValue, this.setValue);
   }
 
-  // locks
+  // Locks
 
   get locked() {
     const {form: {locked, lockedFields}, name} = this;
     return Store.derived([locked, lockedFields], ([locked, lockedFields]) => locked || lockedFields.has(name));
   }
 
-  // touched / visited
+  // Touched / Visited
 
   get touched() {
     return partialStore(this.form.touchedFields, Has(this.name), this.setTouched);
@@ -82,7 +82,7 @@ export class FieldApi<V = any, A = V, F extends Access.Field<A> = Access.Field<A
     return partialStore(this.form.visitedFields, Has(this.name), this.setVisited);
   }
 
-  // states
+  // Summary states
 
   get valid() {
     return Store.derived(this.summary, Selectors.valid);
@@ -109,7 +109,7 @@ export class FieldApi<V = any, A = V, F extends Access.Field<A> = Access.Field<A
     return Store.derived(this.summary, Selectors.omitted);
   }
 
-  // messages
+  // Summary messages
 
   get error() {
     return Store.derived(this.form.summary, (s) => s.getError(this.name) || "");

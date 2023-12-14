@@ -1,5 +1,5 @@
-import {Access} from "../api/Access.js";
-import {FormApi} from "../api/FormApi.js";
+import type {Access} from "../api/Access.js";
+import type {FormApi} from "../api/FormApi.js";
 import {FieldApi} from "../api/FieldApi.js";
 import {Wrap, wrap} from "./Wrap.js";
 import {FormWrap} from "./FormWrap.js";

@@ -1,11 +1,11 @@
 {
-  "name": "@vonagam/svelte-vest",
+  "name": "@vonagam/svelte-vest-flowbite",
   "version": "0.0.1",
   "description": "Helpers for using Vest with Svelte",
   "author": "Dmitry Maganov <vonagam@gmail.com>",
   "license": "MIT",
   "repository": "vonagam/svelte-vest",
-  "packageManager": "pnpm@8.11.0",
+  "packageManager": "pnpm@8.9.2",
   "type": "module",
   "files": [
     "build"
@@ -14,11 +14,16 @@
     "build": "svelte-package -i src -o build"
   },
   "peerDependencies": {
+    "@vonagam/svelte-vest": "workspace:^",
     "svelte": "^4.2.2",
     "vest": "^5.1.2"
   },
+  "dependencies": {
+    "tailwind-merge": "^2.0.0"
+  },
   "devDependencies": {
     "@sveltejs/package": "^2.2.2",
+    "@vonagam/svelte-vest": "workspace:*",
     "svelte": "^4.2.2",
     "svelte-preprocess": "^5.0.4",
     "typescript": "^5.2.2",

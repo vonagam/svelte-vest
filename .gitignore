@@ -238,3 +238,4 @@ $RECYCLE.BIN/
 
 /.notes
 /build
+/packages/*/build
