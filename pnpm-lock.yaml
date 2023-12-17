@@ -21,8 +21,8 @@ importers:
         specifier: ^5.2.2
         version: 5.2.2
       vest:
-        specifier: ^5.1.2
-        version: 5.1.2
+        specifier: ^5.2.3
+        version: 5.2.3
 
   examples/svelte-vest:
     devDependencies:
@@ -47,6 +47,9 @@ importers:
       typescript:
         specifier: ^5.0.0
         version: 5.2.2
+      vest:
+        specifier: ^5.2.3
+        version: 5.2.3
       vite:
         specifier: ^4.4.2
         version: 4.5.0
@@ -101,6 +104,9 @@ importers:
       typescript:
         specifier: ^5.0.0
         version: 5.2.2
+      vest:
+        specifier: ^5.2.3
+        version: 5.2.3
       vite:
         specifier: ^4.4.2
         version: 4.5.0
@@ -127,8 +133,8 @@ importers:
         specifier: ^5.2.2
         version: 5.2.2
       vest:
-        specifier: ^5.1.2
-        version: 5.1.2
+        specifier: ^5.2.3
+        version: 5.2.3
 
 packages:
 
@@ -791,10 +797,10 @@ packages:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
     dev: true
 
-  /context@3.0.13:
-    resolution: {integrity: sha512-O9h6VbY8DxcSNTvQaZ3PM6Fj1Rxndr5TAwgTQU8bvJdM06jW8UZvg3wWw67JMX/GgngTI9j6NaZ+btk7nqD82A==}
+  /context@3.0.20:
+    resolution: {integrity: sha512-0ZKILG8NZ29IuijTiBivZiN5Ojj85orqXnwUF1NkV51i9rF9fc601euW24F9ns78tqvx799P7/7AwGzJbBxc7A==}
     dependencies:
-      vest-utils: 1.1.0
+      vest-utils: 1.2.4
     dev: true
 
   /cookie@0.5.0:
@@ -1239,11 +1245,11 @@ packages:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
     dev: true
 
-  /n4s@5.0.7:
-    resolution: {integrity: sha512-sx4fxDohLqkiCDYOLtr/t8IukO2Ocq4WszA9rDjbWo376RFZOUcK91gTbN5BPo5r/RSCuLQWpmSKRC0RG4OUZQ==}
+  /n4s@5.0.14:
+    resolution: {integrity: sha512-3XjTHJeF+fLvvKOFTb6TFaJWbncsoBNorJJ2BsKKQHYLSMpG2Kq4h7GbJSrx9zgezfUF5Ao2PfZ7Lh9T+ZpH2A==}
     dependencies:
-      context: 3.0.13
-      vest-utils: 1.1.0
+      context: 3.0.20
+      vest-utils: 1.2.4
     dev: true
 
   /nanoid@3.3.7:
@@ -1724,31 +1730,31 @@ packages:
       '@fastify/busboy': 2.0.0
     dev: true
 
-  /vast@1.0.22:
-    resolution: {integrity: sha512-y/Ehqj4dlSxlsoz+3uY3VkK/SvmRfUDKjZOoH3AEo4K60ewPpKfY1+rw4JAN85xjEo6tu5Y2PDYZVCwgEQN+Bw==}
+  /vast@1.0.29:
+    resolution: {integrity: sha512-BHDPBUBdlzEkyqZks/EjdpI3B7nLfme+3hsDVUxOqA7A/CGpN1lH3mom4yDm8at5K/olLhz/XQAEywPMhmN/Wg==}
     dependencies:
-      vest-utils: 1.1.0
+      vest-utils: 1.2.4
     dev: true
 
-  /vest-utils@1.1.0:
-    resolution: {integrity: sha512-BL2XdKt38c5lugRQFrOsxefo5PWkOiUetnPTT/D51LXGMT83KX4au3x377Y3RpiOBxzrKEJkXJAtcrLSwel54Q==}
+  /vest-utils@1.2.4:
+    resolution: {integrity: sha512-cO7K8KG+AdjvFnGdk1hYmoRdgRr9suQUC2IeJyDXke0GkMoQWQrGs1EQ8hSfeI7+CkI2wurX73byifg713Zaxw==}
     dev: true
 
-  /vest@5.1.2:
-    resolution: {integrity: sha512-RHGCb09BSD6R2aqe6/KXAdrqI5TZRDt5bYslpGaA4BV+UGtI2l3kXS2ZF9uDGv3NRnB1/jik4enWJVGwzg8mKQ==}
+  /vest@5.2.3:
+    resolution: {integrity: sha512-SeZSR7YdyFfrz2c8ct1GevgBFyntq1F5mBO+3EstfvGnN4UJ/snKwz3wsElsIbJcc0NwH2xDhQ3gGgw3ctbUdg==}
     dependencies:
-      context: 3.0.13
-      n4s: 5.0.7
-      vast: 1.0.22
-      vest-utils: 1.1.0
-      vestjs-runtime: 1.0.4
+      context: 3.0.20
+      n4s: 5.0.14
+      vast: 1.0.29
+      vest-utils: 1.2.4
+      vestjs-runtime: 1.2.3
     dev: true
 
-  /vestjs-runtime@1.0.4:
-    resolution: {integrity: sha512-FwM2guyYsnUyXQdEOUIqPTjzezSBLYgtDM7fD+y6gCjbR2ye9SoF6LX9B+GFkneXxpqRaTf3n99MyB12txSRmg==}
+  /vestjs-runtime@1.2.3:
+    resolution: {integrity: sha512-3etKUUkSbCBsAtKrYMr0C4N8f3LKdYsj8HKx8zKj8WTuvOFPUGBXxjNlGmGAhEP+fNQWQwoq/RlR7DnPDMQTgA==}
     dependencies:
-      context: 3.0.13
-      vest-utils: 1.1.0
+      context: 3.0.20
+      vest-utils: 1.2.4
     dev: true
 
   /vite@4.5.0:

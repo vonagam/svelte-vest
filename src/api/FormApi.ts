@@ -375,26 +375,26 @@ export class FormApi<V = any, A = V> {
 
   // Summary messages
 
-  getError(): Suite.Failure<V, A> | undefined {
-    return this.summaryStore.value.getError() as any;
+  getError() {
+    return this.summaryStore.value.getError();
   }
   getErrors() {
     return this.summaryStore.value.getErrors();
   }
-  getWarning(): Suite.Failure<V, A> | undefined {
-    return this.summaryStore.value.getWarning() as any;
+  getWarning() {
+    return this.summaryStore.value.getWarning();
   }
   getWarnings() {
     return this.summaryStore.value.getWarnings();
   }
-  get error(): Store.Readable<Suite.Failure<V, A> | undefined> {
-    return Store.derived(this.summaryStore, (s) => s.getError() as any);
+  get error() {
+    return Store.derived(this.summaryStore, (s) => s.getError());
   }
   get errors() {
     return Store.derived(this.summaryStore, (s) => s.getErrors());
   }
-  get warning(): Store.Readable<Suite.Failure<V, A> | undefined> {
-    return Store.derived(this.summaryStore, (s) => s.getWarning() as any);
+  get warning() {
+    return Store.derived(this.summaryStore, (s) => s.getWarning());
   }
   get warnings() {
     return Store.derived(this.summaryStore, (s) => s.getWarnings());

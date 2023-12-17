@@ -1,11 +1,11 @@
 {
   "name": "@vonagam/svelte-vest",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Helpers for using Vest with Svelte",
   "author": "Dmitry Maganov <vonagam@gmail.com>",
   "license": "MIT",
   "repository": "vonagam/svelte-vest",
-  "packageManager": "pnpm@8.11.0",
+  "packageManager": "pnpm@8.12.1",
   "type": "module",
   "files": [
     "build"
@@ -15,14 +15,14 @@
   },
   "peerDependencies": {
     "svelte": "^4.2.2",
-    "vest": "^5.1.2"
+    "vest": "^5.2.3"
   },
   "devDependencies": {
     "@sveltejs/package": "^2.2.2",
     "svelte": "^4.2.2",
     "svelte-preprocess": "^5.0.4",
     "typescript": "^5.2.2",
-    "vest": "^5.1.2"
+    "vest": "^5.2.3"
   },
   "exports": {
     ".": {
